@@ -88,7 +88,7 @@ if uploaded_file is not None:
     def convert_df(df):
         return df.to_csv(index=False).encode('utf-8')
     
-    csv = convert_df(df_clean__)
+    csv = convert_df(df_clean_location__)
     st.download_button("Download Transformed File",
                         csv, 
                         'clean_blocks.csv', 
