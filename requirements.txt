@@ -2,4 +2,3 @@ pandas
 geopy==2.3.0
 geopandas
 xlrd
-math
