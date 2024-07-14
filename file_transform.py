@@ -10,13 +10,10 @@ import math
 st.title("Dream Defenders Blocks File Transformer")
 
 # %%
-uploaded_file = st.file_uploader("Choose a file", type = 'csv')
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file, index_col=0)
-    df_zips = pd.read_excel("ZIP_Locale_Detail.xls")
-    df_zips_counties = pd.read_csv("Zips and Counties - Sheet1.csv", header=None, names=["data"])
-    
-    def zips(i):
+df_zips = pd.read_excel("ZIP_Locale_Detail.xls")
+df_zips_counties = pd.read_csv("Zips and Counties - Sheet1.csv", header=None, names=["data"])
+
+def zips(i):
     y = str(i)
     if len(y) == 3:
         x = ''.join(("00",y))
@@ -25,21 +22,24 @@ if uploaded_file is not None:
     else:
         x = y
     return x
-    df_zips["PHYSICAL ZIP_CHANGE"] = df_zips["PHYSICAL ZIP"].apply(lambda x: zips(x))
+df_zips["PHYSICAL ZIP_CHANGE"] = df_zips["PHYSICAL ZIP"].apply(lambda x: zips(x))
 
-    def concat(x,y):
+def concat(x,y):
     if pd.isna(x):
         x = 0
     if pd.isna(y):
         y = 0
     return f"{x},{y}"
+
+def dist(x, y):
+    return round(geodesic(eval(x),eval(y)).miles,1)
+
+
+uploaded_file = st.file_uploader("Choose a file", type = 'csv')
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file, index_col=0)
     df['voting_location'] = df.apply(lambda row: concat(row['voting_address_latitude'], row['voting_address_longitude']), axis=1)
     df['collection_location'] = df.apply(lambda row: concat(row['collection_location_latitude'], row['collection_location_longitude']), axis=1)
-
-    def dist(x, y):
-    return round(geodesic(eval(x),eval(y)).miles,1)
-    df_clean_location_["distance"] = df_clean_location_.apply(lambda row: dist(row['voting_location'], row['collection_location']), axis=1)
-
     df['extras'] = df['extras'].apply(lambda x: json.loads(x))
     df_extras = df.extras.apply(pd.Series)
     df_clean = pd.merge(right=df, left=df_extras, right_index = True, left_index=True)
@@ -49,6 +49,7 @@ if uploaded_file is not None:
     df_clean_location = df_clean_location.drop(["PHYSICAL ZIP"], axis=1)
     df_clean_location_ = pd.merge(left=df_clean_location, right=df_zips[["PHYSICAL ZIP", "PHYSICAL CITY"]], left_on = "collection_location_zip", right_on = "PHYSICAL ZIP")
     df_clean_location_.rename(columns={"PHYSICAL CITY": "collection_city_clean"}, inplace=True)
+    df_clean_location_["distance"] = df_clean_location_.apply(lambda row: dist(row['voting_location'], row['collection_location']), axis=1)
     gender_columns = [col for col in df_clean_location_.columns if 'gender' in col]
     df_clean_location_['gender_combined'] = df_clean_location_[gender_columns].bfill(axis=1).iloc[:, 0]
     race_columns = [col for col in df_clean_location_.columns if 'race' in col]
