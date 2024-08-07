@@ -45,10 +45,10 @@ if uploaded_file is not None:
     df_extras = df.extras.apply(pd.Series)
     df_clean = pd.merge(right=df, left=df_extras, right_index = True, left_index=True)
 
-    df_clean_location = pd.merge(left=df_clean, right=df_zips[["PHYSICAL ZIP", "PHYSICAL CITY"]], left_on = "voting_zipcode", right_on = "PHYSICAL ZIP")
+    df_clean_location = pd.merge(left=df_clean, right=df_zips[["PHYSICAL ZIP", "PHYSICAL CITY"]].drop_duplicates(subset=['PHYSICAL ZIP']), left_on = "voting_zipcode", right_on = "PHYSICAL ZIP",how='left')
     df_clean_location.rename(columns={"PHYSICAL CITY": "voting_city_clean"}, inplace=True)
     df_clean_location = df_clean_location.drop(["PHYSICAL ZIP"], axis=1)
-    df_clean_location_ = pd.merge(left=df_clean_location, right=df_zips[["PHYSICAL ZIP", "PHYSICAL CITY"]], left_on = "collection_location_zip", right_on = "PHYSICAL ZIP")
+    df_clean_location_ = pd.merge(left=df_clean_location, right=df_zips[["PHYSICAL ZIP", "PHYSICAL CITY"]].drop_duplicates(subset=['PHYSICAL ZIP']), left_on = "collection_location_zip", right_on = "PHYSICAL ZIP", how="left")
     df_clean_location_.rename(columns={"PHYSICAL CITY": "collection_city_clean"}, inplace=True)
     df_clean_location_["distance"] = df_clean_location_.apply(lambda row: dist(row['voting_location'], row['collection_location']), axis=1)
     gender_columns = [col for col in df_clean_location_.columns if 'gender' in col]
@@ -76,7 +76,7 @@ if uploaded_file is not None:
     df_zips_counties_combined.columns.values[3]='county'
     df_zips_counties_combined['zip_code']=df_zips_counties_combined['zip_code'].astype(float)
 
-    df_clean_location__ = pd.merge(left=df_clean_location_, right=df_zips_counties_combined, left_on = "voting_zipcode", right_on = "zip_code")
+    df_clean_location__ = pd.merge(left=df_clean_location_, right=df_zips_counties_combined, left_on = "voting_zipcode", right_on = "zip_code",how='left')
     df_clean_location__.rename(columns={"county": "voting_county"}, inplace=True)
 
     df_clean_location__['voting_street_address_one'] = df_clean_location__['voting_county']
