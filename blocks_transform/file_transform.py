@@ -11,8 +11,8 @@ import streamlit as st
 st.title("Dream Defenders Blocks File Transformer")
 
 # %%
-df_zips = pd.read_excel("zip code reference/ZIP_Locale_Detail.xls")
-df_zips_counties = pd.read_csv("zip code reference/Zips and Counties - Sheet1.csv", header=None, names=["data"])
+df_zips = pd.read_excel("ZIP_Locale_Detail.xls")
+df_zips_counties = pd.read_csv("Zips and Counties - Sheet1.csv", header=None, names=["data"])
 
 def zips(i):
     y = str(i)
