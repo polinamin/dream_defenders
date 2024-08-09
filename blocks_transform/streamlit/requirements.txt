@@ -13,3 +13,4 @@ python-dotenv==1.0.1
 streamlit==1.37.1
 streamlit-aggrid==0.3.4.post3
 xlrd==2.0.1
+openpyxl
