@@ -15,7 +15,7 @@ st.title("Dream Defenders Blocks File Transformer")
 
 # %%
 
-df_zips = openpyxl.load_workbook("ZIP_Locale_Detail.xls")
+df_zips = pd.read_excel("ZIP_Locale_Detail.xls")
 df_zips_counties = pd.read_csv("Zips and Counties - Sheet1.csv", header=None, names=["data"])
 
 def zips(i):
